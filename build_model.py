@@ -13,11 +13,11 @@ class FeedForwardNet(nn.Module):
         )
         self.softmax = nn.Softmax(dim=1)
 
-    def forward(self, input_data):
-        x = self.flatten(input_data)
-        logits = self.dense_layers(x)
-        predictions = self.softmax(logits)
-        return predictions
+    def forward(self, x):
+        x = self.flatten(x)
+        x = self.dense_layers(x)
+        x = self.softmax(x)
+        return x
 
 
 
