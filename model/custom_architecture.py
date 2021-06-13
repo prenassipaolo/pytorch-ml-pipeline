@@ -9,19 +9,20 @@ class Architecture:
     Attributes
     ----------
     MODEL_NAME : str
-            Name of the model class
+        Name of the model class
     MODEL_PATH : str
-            Path of the file containing the model architecture
-    PARAMETERS_PATH
+        Path of the file containing the model architecture
+    PARAMETERS_PATH:
+        Path of the json file containing the parameters
 
     Methods
     -------
     get_class()
-        load MODEL_NAME architecture according to MODEL_PATH
+        loads MODEL_NAME architecture according to MODEL_PATH
     get_parameters()
-        load architecture parameters according to PARAMETERS_PATH
+        loads architecture parameters according to PARAMETERS_PATH
     def create_architecture()
-        create an instance of the architecture class, with the defined parameters
+        creates an instance of the architecture class, with the defined parameters
     """
     def __init__(self, MODEL_NAME, MODEL_PATH, PARAMETERS_PATH):
         """
@@ -39,6 +40,15 @@ class Architecture:
         self.create_architecture()
 
     def get_class(self):
+        """
+        Loads MODEL_NAME class according to MODEL_PATH
+
+        Returns
+        ----------
+        class:
+            Instance of the architecture class according to the declared path
+        """
+
         model_path_aux = self.model_path
         if __name__=="__main__":
             model_path_aux = "/".join(self.model_path.split('/')[1:])
@@ -50,6 +60,15 @@ class Architecture:
         return model_class
 
     def get_parameters(self):
+        """
+        Loads class parameters according to PARAMETERS_PATH
+
+        Returns
+        ----------
+        dict:
+            Parameters of the architecture
+        """
+
         parameters_path_aux = self.parameters_path
         #if __name__=="__main__":
         #    parameters_path_aux = "/".join(self.parameters_path.split('/')[1:])
@@ -58,6 +77,9 @@ class Architecture:
         return p
 
     def create_architecture(self):
+        """
+        Creates an instance of the architecture class with the defined parameters
+        """
         self.parameters = self.get_parameters()
         self.architecture = self.get_class()(self.parameters)
         return

@@ -1,0 +1,12 @@
+{
+    "architecture": {
+        "MODEL_NAME": "FeedForwardNet", 
+        "MODEL_PATH": "model/architectures/feedforwardnet.py", 
+        "PARAMETERS_PATH": "model/architectures/feedforwardnet_parameters.json"
+    },
+    "loss": {
+        "LOSS_NAME": "BinaryCrossEntropy", 
+        "LOSS_PATH": "model/losses/binarycrossentropy.py", 
+        "PARAMETERS_PATH": "model/losses/binarycrossentropy_parameters.json"
+    }
+}

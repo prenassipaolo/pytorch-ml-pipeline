@@ -33,9 +33,11 @@ class Model:
         
 
     def __call__(self, epoch_score, model, model_path='checkpoint.pth'):
+        return
 
     def get_architecture(MODEL_NAME, MODEL_PATH, PARAMETERS_PATH):
         #   ritorna architettura (istanza della classe)
+        return
 
 def train(model, epoch, log_interval, train_loader, optimizer, scheduler, loss):
     model.train()
