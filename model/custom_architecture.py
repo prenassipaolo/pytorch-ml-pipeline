@@ -74,9 +74,7 @@ class Architecture:
 
         return self.architecture
 
-
-
-
+"""
 ### EXAMPLE
 
 MODEL_NAME="FeedForwardNet"
@@ -86,4 +84,7 @@ PARAMETERS_PATH = "model/architectures/feedforwardnet_parameters.json"
 #print(model_class)
 
 a = Architecture(MODEL_NAME, MODEL_PATH, PARAMETERS_PATH)
-print(a.architecture)
+
+print(1, a)
+print(2, a())
+"""
