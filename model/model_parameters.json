@@ -1,0 +1,23 @@
+{
+    "architecture": {
+        "NAME": "FeedForwardNet", 
+        "PATH": "architectures/feedforwardnet.py", 
+        "PARAMETERS": {
+            "in_dim" : 784,
+            "hidden_dim" : 256, 
+            "out_dim" : 10
+        }
+    },
+    "loss": {
+        "NAME": "BinaryCrossEntropy", 
+        "PATH": "losses/binarycrossentropy.py", 
+        "PARAMETERS": {}
+    },
+    "optimizer": {
+        "NAME": "Adam", 
+        "PATH": "optimizers/adam.py", 
+        "PARAMETERS": {
+            "LEARNING_RATE": 0.001
+        }
+    }
+}

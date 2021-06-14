@@ -9,6 +9,7 @@ class FeedForwardNet(nn.Module):
         self.in_dim = parameters['in_dim']
         self.hidden_dim = parameters['hidden_dim']
         self.out_dim = parameters['out_dim']
+
         self.flatten = nn.Flatten()
         self.dense_layers = nn.Sequential(
             nn.Linear(self.in_dim, self.hidden_dim),
