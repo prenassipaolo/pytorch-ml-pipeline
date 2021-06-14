@@ -31,8 +31,9 @@ class Model:
     
     def create_item_instance(self, item):
         if self.model_parameters:
-            item_class = self.get_item_class(item)
-            return item_class(self.model_parameters[item]["PARAMETERS"])
+            if item in self.model_parameters.keys():
+                item_class = self.get_item_class(item)
+                return item_class(self.model_parameters[item]["PARAMETERS"])
         return
 
 
