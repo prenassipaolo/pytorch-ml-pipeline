@@ -37,7 +37,7 @@ class Model:
         return
 
 
-"""
+""""""
 ### EXAMPLE
 
 model_parameters_path = "model/model_parameters.json"
@@ -48,4 +48,4 @@ print("---Model\n", M)
 print("---architecture\n", M.architecture)
 print("---loss\n", M.loss)
 print("---optimizer\n", M.optimizer(M.architecture.parameters()))
-"""
+

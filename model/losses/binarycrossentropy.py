@@ -4,7 +4,6 @@ class BinaryCrossEntropy:
     def __init__(self, parameters):
         
         self.parameters = parameters
-        self.function = self.function
 
     def function(self, x, y):
         log_prob = -1.0 * F.log_softmax(x, 1)

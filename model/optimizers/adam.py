@@ -4,7 +4,6 @@ class Adam:
     def __init__(self, parameters):
         
         self.learning_rate = parameters["LEARNING_RATE"]
-        self.function = self.function
 
     def function(self, model_parameters):
         return optim.Adam(model_parameters, lr=self.learning_rate)
