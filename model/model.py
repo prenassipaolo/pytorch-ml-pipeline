@@ -11,7 +11,7 @@ class Model:
         self.update_model_parameters()
         self.architecture = self.create_item_instance("architecture")
         self.loss = self.create_item_instance("loss")
-        self.optimizer = self.create_item_instance("optimizer")#(self.architecture.parameters()
+        self.optimizer = self.create_item_instance("optimizer")#(self.architecture.parameters())
     
 
 
