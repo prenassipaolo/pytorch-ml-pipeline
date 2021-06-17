@@ -11,7 +11,7 @@ class Model:
         self.update_model_parameters()
         self.architecture = self.create_item_instance("architecture")
         self.loss = self.create_item_instance("loss")
-        self.optimizer = self.create_item_instance("optimizer")#(self.architecture.parameters())
+        self.optimizer = self.create_item_instance("optimizer")(self.architecture.parameters())
     
 
 
@@ -47,5 +47,5 @@ M = Model(model_parameters_path=model_parameters_path)
 print("---Model\n", M)
 print("---architecture\n", M.architecture)
 print("---loss\n", M.loss)
-print("---optimizer\n", M.optimizer(M.architecture.parameters()))
+print("---optimizer\n", M.optimizer)
 
