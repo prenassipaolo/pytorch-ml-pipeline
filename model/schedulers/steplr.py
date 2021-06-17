@@ -1,6 +1,6 @@
 import torch.optim as optim
 
-class Scheduler:
+class StepLR:
     def __init__(self, parameters):
         
         self.step_size = parameters["STEP_SIZE"]

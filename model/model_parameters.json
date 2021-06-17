@@ -21,8 +21,8 @@
         }
     },
     "scheduler": {
-        "NAME": "Scheduler", 
-        "PATH": "schedulers/scheduler.py", 
+        "NAME": "StepLR", 
+        "PATH": "schedulers/steplr.py", 
         "PARAMETERS": {
             "STEP_SIZE": 20,
             "GAMMA": 0.1
