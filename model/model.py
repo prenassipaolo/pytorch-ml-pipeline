@@ -121,9 +121,13 @@ class Model:
                 filepath = path_folder + f'{filename}' + '.{ext}'
 
         # save model_parameters into .json file
-        if json_file and self.model_parameters:
-            with open(filepath.format(ext='json'), 'w') as fp:
-                json.dump(self.model_parameters, fp)
+        if json_file:
+            # check if there are parameters to store
+            if self.model_parameters:
+                with open(filepath.format(ext='json'), 'w') as fp:
+                    json.dump(self.model_parameters, fp)
+            else:    
+                print('No parameters to store. Fill the model_parameters attribute before saving into json file.')
         # save model weights into .h5 file
         if weights_file:
             torch.save(
