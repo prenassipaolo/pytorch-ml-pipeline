@@ -19,5 +19,13 @@
         "PARAMETERS": {
             "LEARNING_RATE": 0.001
         }
+    },
+    "scheduler": {
+        "NAME": "Scheduler", 
+        "PATH": "schedulers/scheduler.py", 
+        "PARAMETERS": {
+            "STEP_SIZE": 20,
+            "GAMMA": 0.1
+        }
     }
 }
