@@ -1,5 +1,8 @@
 import importlib
 import json
+import pickle
+import os
+import torch
 
 
 
@@ -50,26 +53,143 @@ class Model:
         if item_class and self.optimizer:
             return item_class(self.optimizer)
         return 
+    
+    def save_weights(self, path=None):
+        saved = False
+        if path:
+            torch.save(
+                self.architecture.state_dict(), 
+                path
+                )
+            saved = True
+        elif self.model_parameters:
+            if 'save' in self.model_parameters.keys():
+                if 'PATH_WEIGHTS' in self.model_parameters['save'].keys():
+                    torch.save(
+                        self.architecture.state_dict(), 
+                        self.model_parameters['save']['PATH_WEIGHTS']
+                        )
+                    saved = True
+        if not saved:
+            print('\nFile not saved. No path provided\n')
+        return saved
+
+    def save_pickle(self, path=None):
+        
+        saved = False
+        
+        if path:
+            with open(path, 'wb') as fp:
+                pickle.dump(self, fp, protocol=pickle.HIGHEST_PROTOCOL)
+            saved = True
+        elif self.model_parameters:
+            if 'save' in self.model_parameters.keys():
+                if 'PATH_PICKLE' in self.model_parameters['save'].keys():
+                    with open(self.model_parameters['save']['PATH_PICKLE'], 'wb') as fp:
+                        pickle.dump(self, fp, protocol=pickle.HIGHEST_PROTOCOL)
+                    saved = True
+        if not saved:
+            print('\nFile not saved. No path provided.\n')
+        
+        return saved
+    
+    def save(self, filename='model', path_folder='./outputs/', pickle_file=False, json_file=True, weights_file=True, inplace=False):
+        
+        if not os.path.exists(path_folder):
+            os.makedirs(path_folder)
+            print("Directory " , path_folder ,  " created ")
+        
+        # check if the user wants to overwrite the file in case it exists
+        if inplace:
+            filepath = path_folder + f'{filename}' + '.{ext}'
+        else:
+            # find file "model_N.EXT" with maximum N
+            aux = [f for f in os.listdir(path_folder) if os.path.isfile(''.join([path_folder, f]))]
+            aux = [f for f in aux if f[:len(filename)]==f'{filename}']
+            aux = [f[len(filename):].split('.')[0] for f in aux]
+            print(aux)
+            aux = [f.strip('_').split('_')[0] for f in aux]
+            print(aux)
+            aux_numeric =  [int(f) for f in aux if f.isnumeric()]
+            if aux_numeric:
+                filepath = path_folder + f'{filename}_{max(aux_numeric) + 1}' + '.{ext}'
+                print('empty', filepath)
+            elif '' in aux:
+                filepath = path_folder + f'{filename}_{1}' + '.{ext}'
+                print('empty', filepath)
+            else:
+                filepath = path_folder + f'{filename}' + '.{ext}'
+
+        # save model_parameters into .json file
+        if json_file and self.model_parameters:
+            with open(filepath.format(ext='json'), 'w') as fp:
+                json.dump(self.model_parameters, fp)
+        # save model weights into .h5 file
+        if weights_file:
+            torch.save(
+                self.architecture.state_dict(), 
+                filepath.format(ext='h5')
+                )
+        # save model into .p file
+        if pickle_file:
+            with open(filepath.format(ext='p'), 'wb') as fp:
+                pickle.dump(self, fp, protocol=pickle.HIGHEST_PROTOCOL)
+        
+        return
 
 
+        
+        
+            
 
-""""""
-### EXAMPLE
 
+### EXAMPLES
+# model creation
+
+"""
 model_parameters_path = "model/model_parameters.json"
 
 M = Model(model_parameters_path=model_parameters_path)
-N = Model()
+"""
 
+# model items
+'''
 print("---Model\n", M)
 print("---architecture\n", M.architecture)
 print("---loss\n", M.loss)
 print("---optimizer\n", M.optimizer)
 print("---scheduler\n", M.scheduler)
+'''
+
+# model without parameters
+'''
+N = Model()
+
+N.architecture = M.architecture
+N.loss = M.loss
+N.optimizer = M.optimizer
+N.scheduler = M.scheduler
+'''
+# what can be stored in a model 
+'''
+print("---__class__\n", N.__class__)
+print("---__dict__\n", N.__dict__)
+print("---architecture.__class__\n", N.architecture.__class__)
+print("---architecture.__dict__\n", N.architecture.__dict__)
+print("---weights\n", N.architecture.state_dict())
+'''
+
+# empty model
+"""
+N = Model()
 
 print("---Model\n", N)
 print("---architecture\n", N.architecture)
 print("---loss\n", N.loss)
 print("---optimizer\n", N.optimizer)
 print("---scheduler\n", N.scheduler)
-
+"""
+# save
+"""
+M.save(filename='')
+"""
