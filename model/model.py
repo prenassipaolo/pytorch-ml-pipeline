@@ -54,45 +54,6 @@ class Model:
             return item_class(self.optimizer)
         return 
     
-    def save_weights(self, path=None):
-        saved = False
-        if path:
-            torch.save(
-                self.architecture.state_dict(), 
-                path
-                )
-            saved = True
-        elif self.model_parameters:
-            if 'save' in self.model_parameters.keys():
-                if 'PATH_WEIGHTS' in self.model_parameters['save'].keys():
-                    torch.save(
-                        self.architecture.state_dict(), 
-                        self.model_parameters['save']['PATH_WEIGHTS']
-                        )
-                    saved = True
-        if not saved:
-            print('\nFile not saved. No path provided\n')
-        return saved
-
-    def save_pickle(self, path=None):
-        
-        saved = False
-        
-        if path:
-            with open(path, 'wb') as fp:
-                pickle.dump(self, fp, protocol=pickle.HIGHEST_PROTOCOL)
-            saved = True
-        elif self.model_parameters:
-            if 'save' in self.model_parameters.keys():
-                if 'PATH_PICKLE' in self.model_parameters['save'].keys():
-                    with open(self.model_parameters['save']['PATH_PICKLE'], 'wb') as fp:
-                        pickle.dump(self, fp, protocol=pickle.HIGHEST_PROTOCOL)
-                    saved = True
-        if not saved:
-            print('\nFile not saved. No path provided.\n')
-        
-        return saved
-    
     def save(self, filename='model', path_folder='./outputs/', pickle_file=False, json_file=True, weights_file=True, inplace=False):
         
         if not os.path.exists(path_folder):
@@ -141,10 +102,6 @@ class Model:
         
         return
 
-
-        
-        
-            
 
 
 ### EXAMPLES
