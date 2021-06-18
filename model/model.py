@@ -7,12 +7,12 @@ import torch
 
 
 class Model:
-    def __init__(self, model_parameters=None, model_parameters_path: str=None):
+    def __init__(self, parameters=None, parameters_path: str=None):
 
         # parameters
-        self.model_parameters_path = model_parameters_path
-        self.model_parameters = model_parameters
-        self.update_model_parameters()
+        self.parameters_path = parameters_path
+        self.parameters = parameters
+        self.update_parameters()
         # items
         self.architecture = self.create_item_instance("architecture")
         self.loss = self.create_item_instance("loss")
@@ -21,25 +21,25 @@ class Model:
     
 
 
-    def update_model_parameters(self):
-        if self.model_parameters_path:
-            with open(self.model_parameters_path, 'r') as f:
-                self.model_parameters = json.load(f)
+    def update_parameters(self):
+        if self.parameters_path:
+            with open(self.parameters_path, 'r') as f:
+                self.parameters = json.load(f)
         return
     
     def get_item_class(self, item):
-        aux = self.model_parameters[item]["PATH"].split('/')
+        aux = self.parameters[item]["PATH"].split('/')
         aux[-1] = aux[-1].split(".")[0]
         aux = ".".join(aux)
         module = importlib.import_module(aux)
-        item_class = getattr(module, self.model_parameters[item]["NAME"])
+        item_class = getattr(module, self.parameters[item]["NAME"])
         return item_class
     
     def create_item_instance(self, item):
-        if self.model_parameters:
-            if item in self.model_parameters.keys():
+        if self.parameters:
+            if item in self.parameters.keys():
                 item_class = self.get_item_class(item)
-                return item_class(self.model_parameters[item]["PARAMETERS"])
+                return item_class(self.parameters[item]["PARAMETERS"])
         return
     
     def create_optimizer(self):
@@ -81,14 +81,14 @@ class Model:
             else:
                 filepath = path_folder + f'{filename}' + '.{ext}'
 
-        # save model_parameters into .json file
+        # save parameters into .json file
         if json_file:
             # check if there are parameters to store
-            if self.model_parameters:
+            if self.parameters:
                 with open(filepath.format(ext='json'), 'w') as fp:
-                    json.dump(self.model_parameters, fp)
+                    json.dump(self.parameters, fp)
             else:    
-                print('No parameters to store. Fill the model_parameters attribute before saving into json file.')
+                print('No parameters to store. Fill the parameters attribute before saving into json file.')
         # save model weights into .h5 file
         if weights_file:
             torch.save(
@@ -101,6 +101,11 @@ class Model:
                 pickle.dump(self, fp, protocol=pickle.HIGHEST_PROTOCOL)
         
         return
+    
+    def train(self, train_set, test_set):
+        from train import train as do_train
+        do_train(self)
+        return 
 
 
 
@@ -108,9 +113,9 @@ class Model:
 # model creation
 
 """
-model_parameters_path = "model/model_parameters.json"
+parameters_path = "model/default_parameters.json"
 
-M = Model(model_parameters_path=model_parameters_path)
+M = Model(parameters_path=parameters_path)
 """
 
 # model items
