@@ -4,8 +4,6 @@ import pickle
 import os
 import torch
 
-
-
 class Model:
     def __init__(self, parameters=None, parameters_path: str=None):
 
@@ -18,9 +16,10 @@ class Model:
         self.loss = self.create_item_instance("loss")
         self.optimizer = self.create_optimizer()
         self.scheduler = self.create_scheduler()
+        self.train = self.create_item_instance("train")
+        # outputs
+        self.history = None
     
-
-
     def update_parameters(self):
         if self.parameters_path:
             with open(self.parameters_path, 'r') as f:
@@ -52,6 +51,12 @@ class Model:
         item_class = self.create_item_instance('scheduler')
         if item_class and self.optimizer:
             return item_class(self.optimizer)
+        return 
+
+    def create_train(self):
+        item_class = self.create_item_instance('train')
+        if item_class and self.train:
+            return item_class(self.train)
         return 
     
     def save(self, filename='model', path_folder='./outputs/', pickle_file=False, json_file=True, weights_file=True, inplace=False):
@@ -101,22 +106,22 @@ class Model:
                 pickle.dump(self, fp, protocol=pickle.HIGHEST_PROTOCOL)
         
         return
-    
-    def train(self, train_set, test_set):
-        from train import train as do_train
-        do_train(self)
-        return 
+        
+    def do_train(self, train_set, test_set):
+        self.history = self.train.train(self, train_set, test_set)
+        return self.history
+
 
 
 
 ### EXAMPLES
 # model creation
-
-"""
+'''
 parameters_path = "model/default_parameters.json"
-
 M = Model(parameters_path=parameters_path)
-"""
+print(M.train.__dict__)
+print(M.architecture.__dict__)
+'''
 
 # model items
 '''
@@ -130,7 +135,6 @@ print("---scheduler\n", M.scheduler)
 # model without parameters
 '''
 N = Model()
-
 N.architecture = M.architecture
 N.loss = M.loss
 N.optimizer = M.optimizer
@@ -146,16 +150,15 @@ print("---weights\n", N.architecture.state_dict())
 '''
 
 # empty model
-"""
+'''
 N = Model()
-
 print("---Model\n", N)
 print("---architecture\n", N.architecture)
 print("---loss\n", N.loss)
 print("---optimizer\n", N.optimizer)
 print("---scheduler\n", N.scheduler)
-"""
+'''
 # save
-"""
+'''
 M.save(filename='')
-"""
+'''
