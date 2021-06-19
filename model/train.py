@@ -1,7 +1,6 @@
 import torch
 from tqdm import tqdm
 import numpy as np
-import pandas as pd
 
 class Train():
     def __init__(self, epochs=2, batch_size=1, log_interval=1):
@@ -39,14 +38,12 @@ class Train():
         # find most likely label index for each element in the batch
         return tensor.argmax(dim=-1)
 
-    #import time as sleep
-
     def train_epoch(self, model, train_loader):
         model.architecture.train()
 
         losses = []
-        accuracy = []
-        
+        correct_sum = 0
+
         pbar = tqdm(total=len(train_loader.dataset))
 
         for batch_idx, (X, y) in enumerate(train_loader):
@@ -60,9 +57,10 @@ class Train():
             # count number of correct predictions
             pred = self.get_likely_index(output)
             correct = self.number_of_correct(pred, y)
-            accuracy.append(correct/len(X))
+            correct_sum += correct
+            #accuracy.append(correct/len(X))
 
-            # loss for a tensor of size (batch x 1 x n_output)
+            # negative log-likelihood for a tensor of size (batch x 1 x n_output)
             loss = model.loss(output.squeeze(), y)
 
             model.optimizer.zero_grad()
@@ -84,28 +82,33 @@ class Train():
 
         pbar.close()
 
-        return np.mean(losses), np.mean(accuracy)
+        accuracy = correct_sum/len(train_loader.dataset)
+
+        return np.mean(losses), accuracy
 
     def test_epoch(self, model, test_loader):
+        # put the model in the evaluation mode
         model.architecture.eval()
-        correct = 0
+
+        correct_sum = 0
         loss = 0
+        with torch.no_grad():  # stops autograd engine from calculating the gradients
+            for X, y in test_loader:
 
-        for X, y in test_loader:
+                X = X.to(self.device)
+                y = y.to(self.device)
 
-            X = X.to(self.device)
-            y = y.to(self.device)
+                # apply model on whole batch directly on device
+                output = model.architecture(X)
 
-            output = model.architecture(X)
+                # count number of correct predictions
+                pred = self.get_likely_index(output)
+                correct_sum += self.number_of_correct(pred, y)
 
-            # count number of correct predictions
-            pred = self.get_likely_index(output)
-            correct += self.number_of_correct(pred, y)
+                # save losses
+                loss += model.loss(output.squeeze(), y)/len(test_loader)
 
-            # save losses
-            loss += model.loss(output.squeeze(), y)/len(test_loader)
-        
-        accuracy = correct/len(test_loader.dataset)
+        accuracy = correct_sum/len(test_loader.dataset)
 
         s = "-- TEST  Loss: {loss:.4f}, Accuracy: {perc_correct:.1f}%"
         d = {
@@ -114,10 +117,12 @@ class Train():
         }
         print(s.format(**d))
 
-        return loss.detach().numpy(), accuracy
+        return loss.item(), accuracy
 
     def train(self, model, train_set, test_set):
+        # send architecture to device
         model.architecture.to(self.device)
+        # set dataloaders
         train_loader = torch.utils.data.DataLoader(
             train_set,
             batch_size=self.batch_size,
@@ -138,27 +143,28 @@ class Train():
         train_accuracy = []
         test_loss = []
         test_accuracy = []
-
+        
         for epoch in range(1, self.epochs + 1):
             print(f'Epoch: {epoch}')
-            # append new metrics
+            # append train metrics
             loss, accuracy = self.train_epoch(model, train_loader)
             train_loss.append(loss)
             train_accuracy.append(accuracy)
+            # append test metrics
             loss, accuracy = self.test_epoch(model, test_loader)
             test_loss.append(loss)
             test_accuracy.append(accuracy)
             # update learning rate
             model.scheduler.step()
-        
-        columns = ['train_loss', 'train_accuracy', 'test_loss', 'test_accuracy']
-        df = pd.DataFrame(
-            np.array([train_loss, train_accuracy, test_loss, test_accuracy]).T,
-            index = np.arange(1, len(train_loss)+1),
-            columns=columns
-            )
 
-        return df
+            # check early stopping
+            model.earlystopping(loss, model.architecture)
+            if model.earlystopping.early_stop:
+                model.architecture.load_state_dict(torch.load(model.earlystopping.checkpoint_path))
+                print("Early stopping")
+                break
+
+        return train_loss, train_accuracy, test_loss, test_accuracy
 
 
 # EXAMPLE
