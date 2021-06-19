@@ -1,7 +1,7 @@
 import torch.optim as optim
 
 class StepLR:
-    def __init__(self, step_size, gamma):
+    def __init__(self, step_size=1, gamma=0.):
         
         self.step_size = step_size
         self.gamma = gamma

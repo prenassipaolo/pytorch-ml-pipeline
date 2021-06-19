@@ -1,9 +1,9 @@
 import torch.nn.functional as F
 
 class BinaryCrossEntropy:
-    def __init__(self, parameter=None):
+    def __init__(self):
 
-        self.parameter = parameter
+        pass
 
     def function(self, x, y):
         log_prob = -1.0 * F.log_softmax(x, 1)

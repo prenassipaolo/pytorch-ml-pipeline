@@ -3,7 +3,7 @@ from torch import nn
 
 class FeedForwardNet(nn.Module):
 
-    def __init__(self, in_dim, hidden_dim, out_dim):
+    def __init__(self, in_dim=1, hidden_dim=1, out_dim=1):
         super().__init__()
 
         self.in_dim = in_dim
