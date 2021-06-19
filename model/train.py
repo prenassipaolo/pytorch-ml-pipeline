@@ -62,7 +62,7 @@ class Train():
             correct = self.number_of_correct(pred, y)
             accuracy.append(correct/len(X))
 
-            # negative log-likelihood for a tensor of size (batch x 1 x n_output)
+            # loss for a tensor of size (batch x 1 x n_output)
             loss = model.loss(output.squeeze(), y)
 
             model.optimizer.zero_grad()
@@ -75,13 +75,12 @@ class Train():
             # print training stats
             pbar.update(len(X))
             if batch_idx % self.log_interval == 0:
-                s = "-- TRAIN Loss: {loss:.4f}, Accuracy: {perc_correct:.0f}%"
+                s = "-- TRAIN Loss: {loss:.4f}, Accuracy: {perc_correct:.1f}%"
                 d = {
                     'loss': loss.item(),
                     'perc_correct': 100. * correct / len(X)
                 }
                 pbar.set_description(s.format(**d))
-                #pbar.set_description(f"-- TRAIN Loss: {loss.item():.4f}, Accuracy: {100. * correct / len(X):.0f}%")
 
         pbar.close()
 
@@ -92,15 +91,11 @@ class Train():
         correct = 0
         losses = []
 
-        #print(f'Test Epoch: {epoch}')
-
         for X, y in test_loader:
 
             X = X.to(self.device)
             y = y.to(self.device)
 
-            # apply transform and model on whole batch directly on device
-            #X = transform(X)
             output = model.architecture(X)
 
             # count number of correct predictions
@@ -113,7 +108,7 @@ class Train():
 
         accuracy = correct/len(test_loader.dataset)
 
-        s = "-- TEST  Loss: {loss:.4f}, Accuracy: {perc_correct:.0f}%"
+        s = "-- TEST  Loss: {loss:.4f}, Accuracy: {perc_correct:.1f}%"
         d = {
             'loss': loss.item(),
             'perc_correct': 100. * accuracy
