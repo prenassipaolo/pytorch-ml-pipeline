@@ -1,7 +1,7 @@
 {
     "architecture": {
         "NAME": "FeedForwardNet", 
-        "PATH": "architectures/feedforwardnet.py", 
+        "PATH": "model/architectures/feedforwardnet.py", 
         "PARAMETERS": {
             "in_dim" : 784,
             "hidden_dim" : 256, 
@@ -10,19 +10,19 @@
     },
     "loss": {
         "NAME": "BinaryCrossEntropy", 
-        "PATH": "losses/binarycrossentropy.py", 
+        "PATH": "model/losses/binarycrossentropy.py", 
         "PARAMETERS": {}
     },
     "optimizer": {
         "NAME": "Adam", 
-        "PATH": "optimizers/adam.py", 
+        "PATH": "model/optimizers/adam.py", 
         "PARAMETERS": {
             "LEARNING_RATE": 0.001
         }
     },
     "scheduler": {
         "NAME": "StepLR", 
-        "PATH": "schedulers/steplr.py", 
+        "PATH": "model/schedulers/steplr.py", 
         "PARAMETERS": {
             "STEP_SIZE": 20,
             "GAMMA": 0.1
@@ -30,7 +30,7 @@
     },
     "train": {
         "NAME": "Train", 
-        "PATH": "train.py", 
+        "PATH": "model/train.py", 
         "PARAMETERS": {
             "EPOCHS": 2,
             "BATCH_SIZE": 256,
