@@ -1,9 +1,9 @@
 import torch.optim as optim
 
 class Adam:
-    def __init__(self, parameters):
+    def __init__(self, learning_rate):
         
-        self.learning_rate = parameters["LEARNING_RATE"]
+        self.learning_rate = learning_rate
 
     def function(self, model_parameters):
         return optim.Adam(model_parameters, lr=self.learning_rate)

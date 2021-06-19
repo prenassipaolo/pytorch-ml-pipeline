@@ -38,7 +38,7 @@ class Model:
         if self.parameters:
             if item in self.parameters.keys():
                 item_class = self.get_item_class(item)
-                return item_class(self.parameters[item]["PARAMETERS"])
+                return item_class(**self.parameters[item]["PARAMETERS"])
         return
     
     def create_optimizer(self):

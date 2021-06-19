@@ -1,11 +1,13 @@
 import torch
 from tqdm import tqdm
+import numpy as np
+import pandas as pd
 
 class Train():
-    def __init__(self, parameters):
-        self.epochs = parameters['EPOCHS']
-        self.batch_size = parameters['BATCH_SIZE']
-        self.log_interval = parameters['LOG_INTERVAL']
+    def __init__(self, epochs=2, batch_size=1, log_interval=1):
+        self.epochs = epochs
+        self.batch_size = batch_size
+        self.log_interval = log_interval
         self.device = self.set_device()
         self.num_workers = self.set_num_workers()
         self.pin_memory = self.set_pin_memory()
@@ -39,13 +41,11 @@ class Train():
 
     #import time as sleep
 
-    def train_epoch(self, model, train_loader, epoch):
+    def train_epoch(self, model, train_loader):
         model.architecture.train()
 
         losses = []
         accuracy = []
-
-        print(f'Epoch: {epoch}')
         
         pbar = tqdm(total=len(train_loader.dataset))
 
@@ -84,12 +84,12 @@ class Train():
 
         pbar.close()
 
-        return losses, accuracy
+        return np.mean(losses), np.mean(accuracy)
 
     def test_epoch(self, model, test_loader):
         model.architecture.eval()
         correct = 0
-        losses = []
+        loss = 0
 
         for X, y in test_loader:
 
@@ -103,9 +103,8 @@ class Train():
             correct += self.number_of_correct(pred, y)
 
             # save losses
-            loss = model.loss(output.squeeze(), y)
-            losses.append(loss.item())
-
+            loss += model.loss(output.squeeze(), y)/len(test_loader)
+        
         accuracy = correct/len(test_loader.dataset)
 
         s = "-- TEST  Loss: {loss:.4f}, Accuracy: {perc_correct:.1f}%"
@@ -115,7 +114,7 @@ class Train():
         }
         print(s.format(**d))
 
-        return losses, accuracy
+        return loss.detach().numpy(), accuracy
 
     def train(self, model, train_set, test_set):
         model.architecture.to(self.device)
@@ -135,19 +134,31 @@ class Train():
             pin_memory=self.pin_memory,
         )
 
-        train_losses = {}
-        train_accuracies = {}
-        test_losses = {}
-        test_accuracies = {}
+        train_loss = []
+        train_accuracy = []
+        test_loss = []
+        test_accuracy = []
 
         for epoch in range(1, self.epochs + 1):
-            train_losses[epoch], train_accuracies[epoch] = \
-                self.train_epoch(model, train_loader, epoch)
-            test_losses[epoch], test_accuracies[epoch] = \
-                self.test_epoch(model, test_loader)
+            print(f'Epoch: {epoch}')
+            # append new metrics
+            loss, accuracy = self.train_epoch(model, train_loader)
+            train_loss.append(loss)
+            train_accuracy.append(accuracy)
+            loss, accuracy = self.test_epoch(model, test_loader)
+            test_loss.append(loss)
+            test_accuracy.append(accuracy)
+            # update learning rate
             model.scheduler.step()
+        
+        columns = ['train_loss', 'train_accuracy', 'test_loss', 'test_accuracy']
+        df = pd.DataFrame(
+            np.array([train_loss, train_accuracy, test_loss, test_accuracy]).T,
+            index = np.arange(1, len(train_loss)+1),
+            columns=columns
+            )
 
-        return train_losses, train_accuracies, test_losses, test_accuracies
+        return df
 
 
 # EXAMPLE
