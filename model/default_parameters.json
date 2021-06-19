@@ -36,5 +36,13 @@
             "batch_size": 256,
             "log_interval": 20
         }
+    },
+    "earlystopping": {
+        "NAME": "EarlyStopping",
+        "PATH": "model/earlystopping/earlystopping.py",
+        "PARAMETERS": {
+            "patience": 2,
+            "mode": "max"
+        }
     }
 }
