@@ -118,17 +118,21 @@ class Train():
         print(s.format(**d))
 
         return loss.item(), accuracy
-    
-    def check_earlystopping(self, model, loss):
-        do_break = False
-        if model.earlystopping:
-            model.earlystopping(loss, model.architecture)
-            if model.earlystopping.early_stop:
-                model.architecture.load_state_dict(torch.load(model.earlystopping.checkpoint_path))
-                print("Early stopping")
-                do_break = True
-        return do_break
 
+    def earlystop(self, model, loss):
+        earlystop = False
+        # check if earlystopping class exists
+        if model.earlystopping:
+            # update earlystopping parameters
+            model.earlystopping(loss, model.architecture)
+            # check if to stop
+            if model.earlystopping.early_stop:
+                # load best model at the end of training
+                model.architecture.load_state_dict(torch.load(model.earlystopping.checkpoint_path)) 
+                print("Early stopping")
+                # force training stop
+                earlystop = True
+        return earlystop
 
     def train(self, model, train_set, test_set):
         # send architecture to device
@@ -154,7 +158,7 @@ class Train():
         train_accuracy = []
         test_loss = []
         test_accuracy = []
-        
+
         for epoch in range(1, self.epochs + 1):
             print(f'Epoch: {epoch}')
             # append train metrics
@@ -169,8 +173,7 @@ class Train():
             model.scheduler.step()
 
             # check early stopping
-            do_break = self.check_earlystopping(model, loss)
-            if do_break:
+            if self.earlystop(model, loss):  #change loss to change metric to check
                 break
 
         return train_loss, train_accuracy, test_loss, test_accuracy
