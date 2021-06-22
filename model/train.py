@@ -1,6 +1,7 @@
 import torch
 from tqdm import tqdm
 import numpy as np
+import pandas as pd
 
 class Train():
     def __init__(self, epochs=2, batch_size=1, log_interval=1):
@@ -176,7 +177,14 @@ class Train():
             if self.earlystop(model, loss):  #change loss to change metric to check
                 break
 
-        return train_loss, train_accuracy, test_loss, test_accuracy
+        columns = ['train_loss', 'train_accuracy', 'test_loss', 'test_accuracy']
+        df = pd.DataFrame(
+            np.array([train_loss, train_accuracy, test_loss, test_accuracy]).T,
+            index = np.arange(1, len(train_loss)+1),
+            columns=columns
+            )
+
+        return df
 
 
 # EXAMPLE
