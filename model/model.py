@@ -3,7 +3,6 @@ import json
 import os
 import pickle
 import pandas as pd
-
 import torch
 
 class Model:
@@ -16,8 +15,8 @@ class Model:
         # items
         self.architecture = self.create_item_instance("architecture")
         self.loss = self.create_item_instance("loss")
-        self.optimizer = self.create_optimizer()
-        self.scheduler = self.create_scheduler()
+        self.optimizer = self.create_item_instance("optimizer")
+        self.scheduler = self.create_item_instance("scheduler")
         self.train = self.create_item_instance("train")
         self.earlystopping = self.create_item_instance("earlystopping")
         # outputs
@@ -42,24 +41,6 @@ class Model:
             if item in self.parameters.keys():
                 item_class = self.get_item_class(item)
                 return item_class(**self.parameters[item]["PARAMETERS"])
-        return None
-
-    def create_optimizer(self):
-        item_class = self.create_item_instance('optimizer')
-        if item_class and self.architecture:
-            return item_class(self.architecture.parameters())
-        return None
-
-    def create_scheduler(self):
-        item_class = self.create_item_instance('scheduler')
-        if item_class and self.optimizer:
-            return item_class(self.optimizer)
-        return None
-
-    def create_train(self):
-        item_class = self.create_item_instance('train')
-        if item_class and self.train:
-            return item_class(self.train)
         return None
 
     def save(self, filename='model', path_folder='./output/', pickle_file=False,\
@@ -119,7 +100,7 @@ class Model:
         return
 
     def do_train(self, train_set, test_set):
-        self.history = self.train.train(self, train_set, test_set)
+        self.history = self.train(self, train_set, test_set)
         return self.history
 
 

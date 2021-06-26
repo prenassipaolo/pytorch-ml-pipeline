@@ -32,7 +32,7 @@
         "NAME": "Train", 
         "PATH": "model/train.py", 
         "PARAMETERS": {
-            "epochs": 30,
+            "epochs": 10,
             "batch_size": 256,
             "log_interval": 5
         }
@@ -41,8 +41,9 @@
         "NAME": "EarlyStopping", 
         "PATH": "model/earlystopping/earlystopping.py", 
         "PARAMETERS": {
-            "patience": 3,
-            "mode": "min"
+            "patience": 1,
+            "mode": "min",
+            "delta": 0.001
         }
     }
 }

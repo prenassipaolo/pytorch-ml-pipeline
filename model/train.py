@@ -1,7 +1,8 @@
-import torch
-from tqdm import tqdm
 import numpy as np
 import pandas as pd
+import torch
+from tqdm import tqdm
+
 
 class Train():
     def __init__(self, epochs=2, batch_size=1, log_interval=1):
@@ -39,7 +40,7 @@ class Train():
         # find most likely label index for each element in the batch
         return tensor.argmax(dim=-1)
 
-    def train_epoch(self, model, train_loader):
+    def train_epoch(self, model, train_loader, optimizer):
         model.architecture.train()
 
         losses = []
@@ -64,9 +65,9 @@ class Train():
             # negative log-likelihood for a tensor of size (batch x 1 x n_output)
             loss = model.loss(output.squeeze(), y)
 
-            model.optimizer.zero_grad()
+            optimizer.zero_grad()
             loss.backward()
-            model.optimizer.step()
+            optimizer.step()
 
             # record loss
             losses.append(loss.item())
@@ -136,6 +137,11 @@ class Train():
         return earlystop
 
     def train(self, model, train_set, test_set):
+        # associate the architecture parameters to the chosen optimizer class
+        optimizer = model.optimizer(model.architecture.parameters())
+        # if scheduler exits associate it to the optimizer
+        if model.scheduler:
+            scheduler = model.scheduler(optimizer)
         # send architecture to device
         model.architecture.to(self.device)
         # set dataloaders
@@ -163,7 +169,7 @@ class Train():
         for epoch in range(1, self.epochs + 1):
             print(f'Epoch: {epoch}')
             # append train metrics
-            loss, accuracy = self.train_epoch(model, train_loader)
+            loss, accuracy = self.train_epoch(model, train_loader, optimizer)
             train_loss.append(loss)
             train_accuracy.append(accuracy)
             # append test metrics
@@ -171,7 +177,8 @@ class Train():
             test_loss.append(loss)
             test_accuracy.append(accuracy)
             # update learning rate
-            model.scheduler.step()
+            if model.scheduler:
+                scheduler.step()
 
             # check early stopping
             if self.earlystop(model, loss):  #change loss to change metric to check
@@ -185,6 +192,9 @@ class Train():
             )
 
         return df
+
+    def __call__(self, model, train_set, test_set):
+        return self.train(model, train_set, test_set)
 
 
 # EXAMPLE
