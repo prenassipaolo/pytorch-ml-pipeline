@@ -15,9 +15,9 @@ class EarlyStopping:
     counter : int
         number of epochs after the checkpoint
     mode : str, optional
-        defines if the loss function should be maximum or minimum 
+        defines if the criterion function should be maximum or minimum 
     best_score : float
-        best loss score (it correspond to the score of the last checkpoint)
+        best criterion score (it correspond to the score of the last checkpoint)
     delta : float, optional
         improvement that the score has to obtain to continue the training
         it is still to implement
@@ -46,7 +46,7 @@ class EarlyStopping:
             number of epochs to run after the best checkpoint model before stopping
             if None the program should execute the training untit the last epoch 
         mode : str, optional
-            defines if the loss function should be maximum or minimum 
+            defines if the criterion function should be maximum or minimum 
         delta : float, optional
             improvement that the score has to obtain to continue the training
             it is still to implement
