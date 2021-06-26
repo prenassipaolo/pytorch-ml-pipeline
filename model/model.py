@@ -12,13 +12,13 @@ class Model:
         self.parameters_path = parameters_path
         self.parameters = parameters
         self.update_parameters()
-        # items
-        self.architecture = self.create_item_instance("architecture")
-        self.criterion = self.create_item_instance("criterion")
-        self.optimizer = self.create_item_instance("optimizer")
-        self.scheduler = self.create_item_instance("scheduler")
-        self.train = self.create_item_instance("train")
-        self.earlystopping = self.create_item_instance("earlystopping")
+        # buildingblocks
+        self.architecture = self.create_buildingblock_instance("architecture")
+        self.criterion = self.create_buildingblock_instance("criterion")
+        self.optimizer = self.create_buildingblock_instance("optimizer")
+        self.scheduler = self.create_buildingblock_instance("scheduler")
+        self.train = self.create_buildingblock_instance("train")
+        self.earlystopping = self.create_buildingblock_instance("earlystopping")
         # outputs
         self.history = pd.DataFrame()
 
@@ -28,19 +28,19 @@ class Model:
                 self.parameters = json.load(f)
         return None
 
-    def get_item_class(self, item):
-        aux = self.parameters[item]["PATH"].split('/')
+    def get_buildingblock_class(self, buildingblock):
+        aux = self.parameters[buildingblock]["PATH"].split('/')
         aux[-1] = aux[-1].split(".")[0]
         aux = ".".join(aux)
         module = importlib.import_module(aux)
-        item_class = getattr(module, self.parameters[item]["NAME"])
-        return item_class
+        buildingblock_class = getattr(module, self.parameters[buildingblock]["NAME"])
+        return buildingblock_class
         
-    def create_item_instance(self, item):
+    def create_buildingblock_instance(self, buildingblock):
         if self.parameters:
-            if item in self.parameters.keys():
-                item_class = self.get_item_class(item)
-                return item_class(**self.parameters[item]["PARAMETERS"])
+            if buildingblock in self.parameters.keys():
+                buildingblock_class = self.get_buildingblock_class(buildingblock)
+                return buildingblock_class(**self.parameters[buildingblock]["PARAMETERS"])
         return None
 
     def save(self, filename='model', path_folder='./output/', pickle_file=False,\
@@ -113,7 +113,7 @@ print(M.train.__dict__)
 print(M.architecture.__dict__)
 '''
 
-# model items
+# model buildingblocks
 '''
 print("---Model\n", M)
 print("---architecture\n", M.architecture)
