@@ -43,7 +43,7 @@ class Train():
     def train_epoch(self, model, train_loader, optimizer):
         model.architecture.train()
 
-        losses = []
+        criterions = []
         correct_sum = 0
 
         pbar = tqdm(total=len(train_loader.dataset))
@@ -63,21 +63,21 @@ class Train():
             #accuracy.append(correct/len(X))
 
             # negative log-likelihood for a tensor of size (batch x 1 x n_output)
-            loss = model.loss(output.squeeze(), y)
+            criterion = model.criterion(output.squeeze(), y)
 
             optimizer.zero_grad()
-            loss.backward()
+            criterion.backward()
             optimizer.step()
 
-            # record loss
-            losses.append(loss.item())
+            # record criterion
+            criterions.append(criterion.item())
 
             # print training stats
             pbar.update(len(X))
             if batch_idx % self.log_interval == 0:
-                s = "-- TRAIN Loss: {loss:.4f}, Accuracy: {perc_correct:.1f}%"
+                s = "-- TRAIN Criterion: {criterion:.4f}, Accuracy: {perc_correct:.1f}%"
                 d = {
-                    'loss': loss.item(),
+                    'criterion': criterion.item(),
                     'perc_correct': 100. * correct / len(X)
                 }
                 pbar.set_description(s.format(**d))
@@ -86,14 +86,14 @@ class Train():
 
         accuracy = correct_sum/len(train_loader.dataset)
 
-        return np.mean(losses), accuracy
+        return np.mean(criterions), accuracy
 
     def test_epoch(self, model, test_loader):
         # put the model in the evaluation mode
         model.architecture.eval()
 
         correct_sum = 0
-        loss = 0
+        criterion = 0
         with torch.no_grad():  # stops autograd engine from calculating the gradients
             for X, y in test_loader:
 
@@ -107,26 +107,26 @@ class Train():
                 pred = self.get_likely_index(output)
                 correct_sum += self.number_of_correct(pred, y)
 
-                # save losses
-                loss += model.loss(output.squeeze(), y)/len(test_loader)
+                # save criterions
+                criterion += model.criterion(output.squeeze(), y)/len(test_loader)
 
         accuracy = correct_sum/len(test_loader.dataset)
 
-        s = "-- TEST  Loss: {loss:.4f}, Accuracy: {perc_correct:.1f}%"
+        s = "-- TEST  Criterion: {criterion:.4f}, Accuracy: {perc_correct:.1f}%"
         d = {
-            'loss': loss.item(),
+            'criterion': criterion.item(),
             'perc_correct': 100. * accuracy
         }
         print(s.format(**d))
 
-        return loss.item(), accuracy
+        return criterion.item(), accuracy
 
-    def earlystop(self, model, loss):
+    def earlystop(self, model, criterion):
         earlystop = False
         # check if earlystopping class exists
         if model.earlystopping:
             # update earlystopping parameters
-            model.earlystopping(loss, model.architecture)
+            model.earlystopping(criterion, model.architecture)
             # check if to stop
             if model.earlystopping.early_stop:
                 # load best model at the end of training
@@ -161,33 +161,33 @@ class Train():
             pin_memory=self.pin_memory,
         )
 
-        train_loss = []
+        train_criterion = []
         train_accuracy = []
-        test_loss = []
+        test_criterion = []
         test_accuracy = []
 
         for epoch in range(1, self.epochs + 1):
             print(f'Epoch: {epoch}')
             # append train metrics
-            loss, accuracy = self.train_epoch(model, train_loader, optimizer)
-            train_loss.append(loss)
+            criterion, accuracy = self.train_epoch(model, train_loader, optimizer)
+            train_criterion.append(criterion)
             train_accuracy.append(accuracy)
             # append test metrics
-            loss, accuracy = self.test_epoch(model, test_loader)
-            test_loss.append(loss)
+            criterion, accuracy = self.test_epoch(model, test_loader)
+            test_criterion.append(criterion)
             test_accuracy.append(accuracy)
             # update learning rate
             if model.scheduler:
                 scheduler.step()
 
             # check early stopping
-            if self.earlystop(model, loss):  #change loss to change metric to check
+            if self.earlystop(model, criterion):  #change criterion to change metric to check
                 break
 
-        columns = ['train_loss', 'train_accuracy', 'test_loss', 'test_accuracy']
+        columns = ['train_criterion', 'train_accuracy', 'test_criterion', 'test_accuracy']
         df = pd.DataFrame(
-            np.array([train_loss, train_accuracy, test_loss, test_accuracy]).T,
-            index = np.arange(1, len(train_loss)+1),
+            np.array([train_criterion, train_accuracy, test_criterion, test_accuracy]).T,
+            index = np.arange(1, len(train_criterion)+1),
             columns=columns
             )
 

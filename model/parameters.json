@@ -8,7 +8,7 @@
             "out_dim" : 10
         }
     },
-    "loss": {
+    "criterion": {
         "NAME": "BinaryCrossEntropy", 
         "PATH": "model/losses/binarycrossentropy.py", 
         "PARAMETERS": {}

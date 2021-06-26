@@ -14,7 +14,7 @@ class Model:
         self.update_parameters()
         # items
         self.architecture = self.create_item_instance("architecture")
-        self.loss = self.create_item_instance("loss")
+        self.criterion = self.create_item_instance("criterion")
         self.optimizer = self.create_item_instance("optimizer")
         self.scheduler = self.create_item_instance("scheduler")
         self.train = self.create_item_instance("train")
@@ -117,7 +117,7 @@ print(M.architecture.__dict__)
 '''
 print("---Model\n", M)
 print("---architecture\n", M.architecture)
-print("---loss\n", M.loss)
+print("---criterion\n", M.criterion)
 print("---optimizer\n", M.optimizer)
 print("---scheduler\n", M.scheduler)
 '''
@@ -126,7 +126,7 @@ print("---scheduler\n", M.scheduler)
 '''
 N = Model()
 N.architecture = M.architecture
-N.loss = M.loss
+N.criterion = M.criterion
 N.optimizer = M.optimizer
 N.scheduler = M.scheduler
 '''
@@ -145,7 +145,7 @@ print("---weights\n", N.architecture.state_dict())
 N = Model()
 print("---Model\n", N)
 print("---architecture\n", N.architecture)
-print("---loss\n", N.loss)
+print("---criterion\n", N.criterion)
 print("---optimizer\n", N.optimizer)
 print("---scheduler\n", N.scheduler)
 '''
